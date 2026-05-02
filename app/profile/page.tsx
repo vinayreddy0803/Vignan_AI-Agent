@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { ArrowLeft, Camera, Mail, Phone, User } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -12,14 +13,46 @@ import { ThemeToggle } from '@/components/theme-toggle'
 import Link from 'next/link'
 
 export default function ProfilePage() {
-  const [name, setName] = useState('John Doe')
-  const [email, setEmail] = useState('john.doe@vignan.ac.in')
-  const [phone, setPhone] = useState('+91 9876543210')
-  const [bio, setBio] = useState('Computer Science student at Vignan University')
+  const router = useRouter()
+  const [user, setUser] = useState<any>(null)
+  const [name, setName] = useState('')
+  const [email, setEmail] = useState('')
+  const [phone, setPhone] = useState('')
+  const [bio, setBio] = useState('')
+
+  // Load user data on mount
+  useEffect(() => {
+    const userData = localStorage.getItem('user')
+    if (!userData) {
+      router.push('/login')
+      return
+    }
+    const parsedUser = JSON.parse(userData)
+    setUser(parsedUser)
+    setName(parsedUser.name || '')
+    setEmail(parsedUser.email || '')
+    setPhone(parsedUser.phone || '')
+    setBio(parsedUser.bio || 'Computer Science student at Vignan University')
+  }, [router])
 
   const handleSave = () => {
-    // Here you would save the profile data
-    console.log('Saving profile:', { name, email, phone, bio })
+    if (!user) return
+
+    // Update user data
+    const updatedUser = {
+      ...user,
+      name,
+      email,
+      phone,
+      bio
+    }
+
+    // Save to localStorage
+    localStorage.setItem('user', JSON.stringify(updatedUser))
+    setUser(updatedUser)
+
+    // Show success message (you could add a toast here)
+    console.log('Profile updated successfully')
   }
 
   return (
@@ -142,7 +175,7 @@ export default function ProfilePage() {
                 <Label htmlFor="student-id">Student ID</Label>
                 <Input
                   id="student-id"
-                  value="VU2024001"
+                  value={user?.studentId || 'VU' + Date.now().toString().slice(-6)}
                   readOnly
                   className="bg-muted"
                 />
@@ -151,7 +184,7 @@ export default function ProfilePage() {
                 <Label htmlFor="department">Department</Label>
                 <Input
                   id="department"
-                  value="Computer Science & Engineering"
+                  value={user?.department || 'Computer Science & Engineering'}
                   readOnly
                   className="bg-muted"
                 />
@@ -163,7 +196,7 @@ export default function ProfilePage() {
                 <Label htmlFor="year">Year</Label>
                 <Input
                   id="year"
-                  value="3rd Year"
+                  value={user?.year || '3rd Year'}
                   readOnly
                   className="bg-muted"
                 />
@@ -172,7 +205,7 @@ export default function ProfilePage() {
                 <Label htmlFor="semester">Semester</Label>
                 <Input
                   id="semester"
-                  value="6th Semester"
+                  value={user?.semester || '6th Semester'}
                   readOnly
                   className="bg-muted"
                 />

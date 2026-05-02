@@ -94,3 +94,108 @@ export async function POST(req: Request) {
     )
   }
 }
+
+
+
+
+
+// import { NextResponse } from 'next/server'
+
+// const OLLAMA_URL = process.env.OLLAMA_API_URL || 'http://localhost:11434'
+
+// const VIGNAN_SYSTEM_PROMPT = `You are VIGNAN AI, an intelligent assistant for Vignan University. You provide accurate, helpful information about:
+
+// **University Information:**
+// - Vignan University is located in Andhra Pradesh, India
+// - Founded in 1997
+// - Offers engineering, management, and science programs
+
+// **Academic Programs:**
+// - Engineering: CSE, ECE, EEE, ME, CE, IT
+// - Management: MBA, BBA
+// - Science: Mathematics, Physics, Chemistry, Biotechnology
+
+// Always be helpful and enthusiastic about Vignan University.`
+
+// export async function POST(req: Request) {
+//   try {
+//     const { messages }: { messages: any[] } = await req.json()
+
+//     const formattedMessages = messages.map(msg => ({
+//       role: msg.role,
+//       content: msg.parts?.find((p: any) => p.type === 'text')?.text || ''
+//     }))
+
+//     // Call Ollama API
+//     const response = await fetch(`${OLLAMA_URL}/api/chat`, {
+//       method: 'POST',
+//       headers: {
+//         'Content-Type': 'application/json',
+//       },
+//       body: JSON.stringify({
+//         model: 'llama2', // Change to your model name
+//         messages: [
+//           { role: 'system', content: VIGNAN_SYSTEM_PROMPT },
+//           ...formattedMessages
+//         ],
+//         stream: true,
+//       })
+//     })
+
+//     if (!response.ok) {
+//       throw new Error(`Ollama API error: ${response.statusText}`)
+//     }
+
+//     const reader = response.body?.getReader()
+//     if (!reader) throw new Error('No response body')
+
+//     const stream = new ReadableStream({
+//       async start(controller) {
+//         const decoder = new TextDecoder()
+//         try {
+//           while (true) {
+//             const { done, value } = await reader.read()
+//             if (done) break
+
+//             const text = decoder.decode(value)
+//             const lines = text.split('\n').filter(line => line.trim())
+
+//             for (const line of lines) {
+//               try {
+//                 const data = JSON.parse(line)
+//                 if (data.message?.content) {
+//                   controller.enqueue(
+//                     new TextEncoder().encode(
+//                       `0:${JSON.stringify({ text: data.message.content })}\n`
+//                     )
+//                   )
+//                 }
+//               } catch (e) {
+//                 // Skip invalid JSON lines
+//               }
+//             }
+//           }
+//           controller.enqueue(new TextEncoder().encode('e:{"finishReason":"stop"}\n'))
+//         } catch (error) {
+//           controller.error(error)
+//         } finally {
+//           controller.close()
+//         }
+//       }
+//     })
+
+//     return new Response(stream, {
+//       headers: {
+//         'Content-Type': 'text/plain; charset=utf-8',
+//         'X-Experimental-Stream-Data': 'true'
+//       }
+//     })
+
+//   } catch (error) {
+//     console.error('Error in chat API:', error)
+//     return NextResponse.json(
+//       { error: 'Failed to connect to Ollama. Make sure Ollama is running on http://localhost:11434' },
+//       { status: 500 }
+//     )
+//   }
+// }

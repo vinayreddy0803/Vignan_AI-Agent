@@ -233,6 +233,7 @@ export default function Dashboard() {
             <Button
               variant="ghost"
               size="icon"
+              onClick={() => router.push('/settings')}
               className="text-muted-foreground hover:text-foreground"
             >
               <Settings className="w-5 h-5" />
